@@ -5,15 +5,25 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    public float moveSpeed = 1f;
+    bool IsMoving
+    {
+        set
+        {
+            isMoving = value;
+            animator.SetBool("isMoving", value);
+        }
+    }
+    public float moveSpeed = 150f;
 
-    public float collisionOffset = 0.05f;
+    public float maxSpeed = 8f;
+
+    public float idleFriction = 0.9f;
 
     public ContactFilter2D movementFilter;
 
     public SwordAttack swordAttack;
 
-    Vector2 movementInput;
+    Vector2 movementInput = Vector2.zero;
 
     SpriteRenderer spriteRenderer;
 
@@ -23,7 +33,8 @@ public class PlayerController : MonoBehaviour
 
     List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
 
-    bool canMove = true;
+    bool isMoving = false;
+    public bool canMove = true;
 
     // Start is called before the first frame update
     void Start()
@@ -33,35 +44,17 @@ public class PlayerController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     private void FixedUpdate()
     {
-        if (canMove)
+        if (canMove && rb.simulated && movementInput != Vector2.zero)
         {
-            if (movementInput != Vector2.zero)
+            // rb.velocity = Vector2.ClampMagnitude(rb.velocity + (movementInput * moveSpeed * Time.deltaTime), maxSpeed);
+            rb.AddForce(movementInput * moveSpeed * Time.deltaTime);
+
+            if (rb.velocity.magnitude > maxSpeed)
             {
-                bool success = TryMove(movementInput);
-
-                if (!success)
-                {
-                    success = TryMove(new Vector2(movementInput.x, 0));
-                }
-
-                if (!success)
-                {
-                    success = TryMove(new Vector2(0, movementInput.y));
-                }
-
-                animator.SetBool("isMoving", success);
-            }
-            else
-            {
-                animator.SetBool("isMoving", false);
+                float limitedSpeed = Mathf.Lerp(rb.velocity.magnitude, maxSpeed, idleFriction);
+                rb.velocity = rb.velocity.normalized * limitedSpeed;
             }
 
             // set direction of sprite to movement direction
@@ -73,26 +66,15 @@ public class PlayerController : MonoBehaviour
             {
                 spriteRenderer.flipX = false;
             }
-        }
-    }
 
-    private bool TryMove(Vector2 direction)
-    {
-        if (direction != Vector2.zero)
+            IsMoving = true;
+        }
+        else
         {
-            int count = rb.Cast(direction, movementFilter, castCollisions, moveSpeed * Time.fixedDeltaTime + collisionOffset);
+            rb.velocity = Vector2.Lerp(rb.velocity, Vector2.zero, idleFriction);
+            IsMoving = false;
 
-            if (count == 0)
-            {
-                rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
-        return false;
     }
 
     void OnMove(InputValue movementValue)

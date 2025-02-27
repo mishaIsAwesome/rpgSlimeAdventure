@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 3
-  knockbackForce: 5000
+  knockbackForce: 15
   swordCollider: {fileID: 2261749913193614526}
 --- !u!1 &4562522765461676157
 GameObject:
@@ -108,7 +108,7 @@ GameObject:
   - component: {fileID: 4874267322821486734}
   - component: {fileID: 1035349652008551451}
   - component: {fileID: 6569873256882193079}
-  - component: {fileID: 7987893082298604433}
+  - component: {fileID: 329131100498533076}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -226,8 +226,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88b437642bd25df4ca3b2651b7f7facb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  collisionOffset: 0.05
+  moveSpeed: 150
+  maxSpeed: 9
+  idleFriction: 0.9
   movementFilter:
     useTriggers: 0
     useLayerMask: 0
@@ -302,7 +303,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.00027244538, y: -0.04149138}
+  m_Offset: {x: -0.00034350157, y: -0.045803}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -313,7 +314,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.09414941, y: 0.08569874}
+  m_Size: {x: 0.117555365, y: 0.077075504}
   m_EdgeRadius: 0
 --- !u!95 &6569873256882193079
 Animator:
@@ -336,7 +337,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7987893082298604433
+--- !u!114 &329131100498533076
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -345,6 +346,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4562522765461676157}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf68aae7af809c04588c90f7b416ccdd, type: 3}
+  m_Script: {fileID: 11500000, guid: 502851bce420d9e4b98b26e8b361b97a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthText: {fileID: 7549376561654005771, guid: debaf155fc83e5b4597ff92c3a74993d, type: 3}
+  disableSimulation: 1
+  health: 3
+  targetable: 1

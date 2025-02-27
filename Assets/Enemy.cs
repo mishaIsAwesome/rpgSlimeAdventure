@@ -2,74 +2,45 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour, IDamageable
+public class Enemy : MonoBehaviour
 {
-    Animator animator;
+    public float damage = 1;
+    public float knockbackForce = 30f;
+
+    public float moveSpeed = 500f;
+
+    public DetectionZone detectionZone;
 
     Rigidbody2D rb;
 
-    bool isAlive = true;
+    DamageableCharacter damageableCharacter;
 
-    public float Health
+    void Start()
     {
-        set
-        {
-            if (value < health)
-            {
-                animator.SetTrigger("Hit");
-            }
-
-            health = value;
-
-            if (health <= 0)
-            {
-                animator.SetBool("isAlive", false);
-            }
-        }
-
-        get
-        {
-            return health;
-        }
-    }
-
-    public float health = 1;
-    public float damage = 1;
-
-    // Start is called before the first frame update
-    private void Start()
-    {
-        animator = GetComponent<Animator>();
-        animator.SetBool("isAlive", isAlive);
-
         rb = GetComponent<Rigidbody2D>();
+        damageableCharacter = GetComponent<DamageableCharacter>();
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-
-    }
-
-    public void OnHit(float damage, Vector2 knockback){
-        Health -= damage;
-        rb.AddForce(knockback);
-    }
-
-    public void OnHit(float damage){
-        Health -= damage;
-    }
-
-    public void RemoveEnemy()
-    {
-        Destroy(gameObject);
+        if (damageableCharacter.Targetable && detectionZone.detectedObjs.Count > 0)
+        {
+            Vector2 direction = (detectionZone.detectedObjs[0].transform.position - transform.position).normalized;
+            rb.AddForce(direction * moveSpeed * Time.deltaTime); 
+        }
     }
 
     void OnCollisionEnter2D(Collision2D col){
-        IDamageable damageable = col.collider.GetComponent<IDamageable>();
+        Collider2D collider = col.collider;
+        IDamageable damageable = collider.GetComponent<IDamageable>();
 
         if (damageable != null){
-            damageable.OnHit(damage);
+            print("knockback!");
+        //    Vector3 parentPosition = transform.parent.position;
+            Vector2 direction = (Vector2)(collider.transform.position - transform.position).normalized;
+            Vector2 knockback = direction * knockbackForce;
+            print("direction: " + direction);  print("knockback: " + knockback);
+            damageable.OnHit(damage, knockback);
         }
     }
 }
